@@ -1,3 +1,15 @@
+*{
+  font-size: 32px;
+}
+
+.navbar{
+  position: static;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+}
+
 body{
   margin: 0px; padding: 0px;
   display: flex;
@@ -10,7 +22,6 @@ body{
   width: 100vw; height: 100vh;
   overflow: hidden; 
   background-color: wheat;
-  font-size: 48px;
 }
 
 .home .container {
@@ -20,13 +31,4 @@ body{
 
 .login{
   width: 100vw; height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login .container{
-  width: 300px; height: 500px;
-  border: 1px solid black; border-radius: 15px;
-  padding: 10px;
 }
