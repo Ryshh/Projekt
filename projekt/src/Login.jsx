@@ -71,7 +71,7 @@ export default function Login() {
     return (
         <>
             <Navbar />
-            <Stack className='login' display={'flex'} justifyContent={'center'} alignItems={'center'} textAlign={'center'}>
+            <Stack className='login' display={'flex'} justifyContent={'center'} alignItems={'center'} textAlign={'center'} bgcolor={"#f5f5f5"}>
                 <Stack className='container' width={550} height={600} p={1.5} marginTop={-15}>
                     <FormControl style={{ gap: 10}}>
                         {signingUp ? <>

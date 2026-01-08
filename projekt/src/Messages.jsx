@@ -17,7 +17,7 @@ export default function Messages() {
     return (
         <>
             <Navbar />
-            <Stack className='messages' display={'flex'} justifyContent={'center'} alignItems={'center'} textAlign={'center'}>
+            <Stack className='messages' display={'flex'} justifyContent={'center'} alignItems={'center'} textAlign={'center'} bgcolor={"#f5f5f5"}>
                 <Stack className='container'>
 
                 </Stack>

@@ -13,7 +13,7 @@ export default function Home() {
     return (
         <>
             <Navbar />
-            <Stack className='home'>
+            <Stack className='home' bgcolor={"#f5f5f5"}>
                 <Stack className='container' marginX={20}>
                     Home
                 </Stack>
