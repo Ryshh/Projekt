@@ -8,6 +8,8 @@ import { signOut } from 'firebase/auth'
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function Navbar() {
 
@@ -31,48 +33,50 @@ export default function Navbar() {
     }
 
     return (
-        <Stack className='navbar' display={'flex'} flexDirection={'row'} justifyContent={'flex-start'} alignItems={'center'} height={80} p={1.5} border={1} borderColor={'black'}>
+        <Stack className='navbar' bgcolor={'#fff'} position={'sticky'} top={0} left={0} zIndex={100} display={'flex'} flexDirection={'row'} justifyContent={'center'} alignItems={'center'} height={80} p={1.5} border={1} borderColor={'black'} >
             <Avatar
-                src="/icon.png"
-                sx={{ width: 80, height: 80 }}
+                src="/PingMe.png"
+                sx={{ width: 64, height: 64, display: { xs: 'none', sm: 'block' }, ml: 1 }}
             ></Avatar>
-            <Typography fontSize={24}>
-                AppName
+            <Typography sx={{ display: { xs: 'none', md: 'block' }, ml: 1 }} fontSize={24}>
+                PingMe
             </Typography>
 
-            <Breadcrumbs style={{ marginLeft: "50px"}}>
-                <Typography fontSize={24} style={currentPage == "home" ? color : pointer} onClick={() => navigate("/")}>
-                    Home
-                </Typography>
-                {loggedIn ?
-                    <Typography fontSize={24} style={currentPage == "messages" ? color : pointer} onClick={() => navigate("/messages")}>
-                        Messages
+            <Stack width={"100%"} display={'flex'} justifyContent={'center'} alignItems={'center'} >
+                <Breadcrumbs style={{ marginLeft: "10px"}}>
+                    <Typography fontSize={24} style={currentPage == "home" ? color : pointer} onClick={() => navigate("/")}>
+                        Home
                     </Typography>
-                :
-                    <Typography fontSize={24} style={currentPage == "messages" ? color : pointer} onClick={() => navigate("/login")}>
-                        Messages
-                    </Typography>
-                }
-            </Breadcrumbs>
+                    {loggedIn ?
+                        <Typography fontSize={24} style={currentPage == "messages" ? color : pointer} onClick={() => navigate("/messages")}>
+                            Messages
+                        </Typography>
+                    :
+                        <Typography fontSize={24} style={currentPage == "messages" ? color : pointer} onClick={() => navigate("/login")}>
+                            Messages
+                        </Typography>
+                    }
+                </Breadcrumbs>           
+            </Stack>
 
             <div style={{flexGrow: 1}}></div>
             {loggedIn ?
             <>
-                <Avatar src={userInfo.profilePic} sx={{ bgcolor: "gray", padding: 1, marginRight: 1   }}></Avatar>
-                <Typography>
-                    {userInfo.username}
+                <Avatar src={userInfo.userPic} sx={{ bgcolor: "gray", padding: 1, marginRight: 1, width: 38, height: 38}}></Avatar>
+                <Typography sx={{ display: { xs: 'none', md: 'block' }, ml: 1 }} fontSize={28} fontWeight={500}>
+                    {userInfo.username} 
                 </Typography>
             </> : <>    
 
             </>}
 
-            <Stack marginLeft={5}>
+            <Stack marginLeft={2}>
                 {currentPage != "login" ? 
                     <>{loggedIn ? 
                     <>
-                        <Button variant="contained" style={{borderRadius: "15px"}} onClick={signingOut} size='small' >Sign out</Button>
+                        <Button variant="contained" style={{borderRadius: "15px"}} onClick={signingOut} size='small' ><LogoutIcon /></Button>
                     </> : <>
-                        <Button variant="contained" style={{borderRadius: "15px"}} onClick={() => navigate("/login")} size='small' >Sign in</Button>
+                        <Button variant="contained" style={{borderRadius: "15px"}} onClick={() => navigate("/login")} size='small' ><LoginIcon /></Button>
                     </>}
                     </> : <>
                 

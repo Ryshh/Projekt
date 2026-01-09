@@ -25,7 +25,7 @@ export default function App() {
   const appContext = {app, auth, navigate, db, currentPage, setCurrentPage}
 
   async function getUserInfo() {
-    if (!loggedIn || userInfo.userID) return
+    if (!loggedIn || user.uid) return
 
     const adatCollection = collection(db, 'users');
     const adatSnapshot = await getDocs(query(adatCollection, where("userID", "==", user.uid)));

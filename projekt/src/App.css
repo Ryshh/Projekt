@@ -1,34 +1,25 @@
 *{
-  font-size: 32px;
-}
+  font-size: 24px;
+} 
 
-.navbar{
-  position: static;
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-}
 
 body{
   margin: 0px; padding: 0px;
   display: flex;
-  overflow: hidden;
 }
 
-.home{
-  margin: 0px;
-  display: flex;
-  width: 100vw; height: 100vh;
-  overflow: hidden; 
-  background-color: wheat;
+@media (min-width: 1000px) {
+  body {
+    overflow: hidden;
+  }
 }
 
-.home .container {
-  border: 1px solid rebeccapurple;
-  background-color: rgba(0, 0, 0, 0.05);
-}
+@media (max-width: 1000px) {
+  .home {
+    overflow-y: scroll;
+  }
 
-.login, .messages{
-  width: 100vw; height: 100vh;
+  body{
+    overflow-x: hidden;
+  }
 }

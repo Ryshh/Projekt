@@ -14,7 +14,7 @@ import { useContext } from 'react';
 import { UserContext } from './UserContext';
 import { AppContext } from './AppContext';
 import { useEffect } from 'react';
-import { addDoc, collection } from 'firebase/firestore';
+import { collection, doc, setDoc } from 'firebase/firestore';
 
 export default function Login() {
 
@@ -31,6 +31,8 @@ export default function Login() {
 
     async function EmailAndPassword() {
         if (!signingUp) {
+            if (!email || !password) return setUzenet("Please fill all fields!");
+
             try {
                 await signInWithEmailAndPassword(auth, email, password)
             } catch (err) {
@@ -41,21 +43,23 @@ export default function Login() {
         else{
             try {
                 const result = await createUserWithEmailAndPassword(auth, email, password)
+                setUzenet("");
 
                 if (signingUp) {
+                    if (!username || !email || !password) return setUzenet("Please fill all fields!");
+
                     let newUser = {
-                        profilePic: "",
-                        userID: result.user.uid,
                         username: username,
-                        email: email
+                        email: email,
+                        profilePic: "",
+                        userID: result.user.uid
                     }
 
-                    const usersCollection = collection(db, "users")
-                    await addDoc(usersCollection, newUser);
+                    await setDoc(doc(db, "users", result.user.uid), newUser);
                 }
             } catch (err) {
-                console.log("Sign up error: ", err);
-            }  
+                setUzenet(err.message.includes("auth/invalid-credential") ? "Incorrect email or password" : err.message);
+            } 
         }
     }
 
@@ -66,12 +70,12 @@ export default function Login() {
         }
 
         setCurrentPage("login")
-    })
+    }, [[loggedIn, navigate, setCurrentPage]])
 
     return (
         <>
             <Navbar />
-            <Stack className='login' display={'flex'} justifyContent={'center'} alignItems={'center'} textAlign={'center'} bgcolor={"#f5f5f5"}>
+            <Stack height={"100vh"} width={"100vw"} display={'flex'} justifyContent={'center'} alignItems={'center'} textAlign={'center'} bgcolor={"#f5f5f5"}>
                 <Stack className='container' width={550} height={600} p={1.5} marginTop={-15}>
                     <FormControl style={{ gap: 10}}>
                         {signingUp ? <>
@@ -102,7 +106,7 @@ export default function Login() {
                             <Button variant="contained" onClick={EmailAndPassword}>Register</Button>
                         </>}
                     </FormControl>
-                    <Typography marginTop={5} fontSize={24} height={50}>
+                    <Typography color='error' marginTop={5} fontSize={24} height={50}>
                         {uzenet}
                     </Typography>
                     <hr style={{ width: "100%"}} />
