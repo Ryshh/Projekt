@@ -1,7 +1,7 @@
 # PingMe
 
 Ez egy egyszerű **üzentetküldő** alkalmazás
-> Van egy kezdőoldal információval a PingMe-ről.
+> Van egy kezdőoldal információval a PingMe-ről.<br/>
 > Van regisztráció,
 > és egy üzenet váltó rész.
 
