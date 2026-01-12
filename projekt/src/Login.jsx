@@ -18,8 +18,8 @@ import { collection, doc, setDoc } from 'firebase/firestore';
 
 export default function Login() {
 
-    let { user, loggedIn } = useContext(UserContext)
-    let { auth, navigate, setCurrentPage } = useContext(AppContext)
+    let { loggedIn } = useContext(UserContext)
+    let { auth, navigate, setCurrentPage, db } = useContext(AppContext)
 
 
     let [ username, setUsername ] = useState("")
@@ -41,18 +41,17 @@ export default function Login() {
             }  
         }
         else{
+            if (!username || !email || !password) return setUzenet("Please fill all fields!");
+
             try {
                 const result = await createUserWithEmailAndPassword(auth, email, password)
                 setUzenet("");
 
                 if (signingUp) {
-                    if (!username || !email || !password) return setUzenet("Please fill all fields!");
-
                     let newUser = {
                         username: username,
                         email: email,
-                        profilePic: "",
-                        userID: result.user.uid
+                        userPic: "",
                     }
 
                     await setDoc(doc(db, "users", result.user.uid), newUser);
@@ -70,7 +69,7 @@ export default function Login() {
         }
 
         setCurrentPage("login")
-    }, [[loggedIn, navigate, setCurrentPage]])
+    }, [loggedIn, navigate, setCurrentPage])
 
     return (
         <>
@@ -83,7 +82,7 @@ export default function Login() {
                                 required
                                 label="Username"
                                 type='text'
-                                onChange={e => setEmail(e.target.value)}
+                                onChange={e => setUsername(e.target.value)}
                             />
                         </> : <>
                             

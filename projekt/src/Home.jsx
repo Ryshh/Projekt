@@ -8,12 +8,15 @@ import Avatar from '@mui/material/Avatar';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BoltIcon from '@mui/icons-material/Bolt';
 import Paper from '@mui/material/Paper';
+import { useEffect } from 'react';
 
 export default function Home() {
 
     const { auth, navigate, setCurrentPage } = useContext(AppContext)
 
-    setCurrentPage("home")
+    useEffect(() => {
+        setCurrentPage("home")
+    }, [setCurrentPage])
 
     return (
         <>

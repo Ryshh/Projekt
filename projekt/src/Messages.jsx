@@ -1,109 +1,163 @@
-import React from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import Navbar from './Navbar'
-import Stack from '@mui/material/Stack'
-import FormControl from '@mui/material/FormControl'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
-import { useContext } from 'react'
-import { AppContext } from './AppContext'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemAvatar from '@mui/material/ListItemAvatar'
-import Avatar from '@mui/material/Avatar'
-import ListItemText from '@mui/material/ListItemText'
-import Paper from '@mui/material/Paper'
-import IconButton from '@mui/material/IconButton'
+import { 
+    Stack, TextField, Typography, List, ListItem, ListItemAvatar, 
+    Avatar, ListItemText, Paper, IconButton 
+} from '@mui/material'
 import SendIcon from '@mui/icons-material/Send';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { UserContext } from './UserContext'
+import { AppContext } from './AppContext'
+import { 
+    collection, query, where, getDocs, onSnapshot, 
+    orderBy, or, and, addDoc, serverTimestamp 
+} from 'firebase/firestore';
 
 export default function Messages() {
+    // userInfo contains the data from the 'users' collection (username, pic, etc)
+    const { user, userInfo } = useContext(UserContext) 
+    const { db, setCurrentPage } = useContext(AppContext)
 
-    let { user, loggedIn } = useContext(UserContext)
-    const { auth, navigate, setCurrentPage } = useContext(AppContext)
-    
-    setCurrentPage("messages")
+    const [users, setUsers] = useState([])
+    const [selectedUser, setSelectedUser] = useState(null)
+    const [messages, setMessages] = useState([])
+    const [newMessage, setNewMessage] = useState("")
+    const scrollRef = useRef()
+
+    useEffect(() => {
+        setCurrentPage("messages")
+    }, [setCurrentPage])
+
+    // 1. Fetch Users List
+    useEffect(() => {
+        async function fetchUsers() {
+            // Use user?.uid (from Firebase Auth) to filter yourself out
+            if (!user?.uid || !db) return
+            try {
+                const q = query(collection(db, "users"));
+                const snap = await getDocs(q);
+
+                const userList = snap.docs
+                    .map(doc => ({ ...doc.data(), id: doc.id })) 
+                    .filter(u => u.id !== user.uid);
+
+                setUsers(userList);
+            } catch (err) {
+                console.error("Error fetching users:", err)
+            }
+        }
+        fetchUsers()
+    }, [db, user?.uid]) // Re-run if user logs in/out
+
+    // 2. Real-time Message Listener
+    useEffect(() => {
+        // Important: Wait until both user and selectedUser are available
+        if (!selectedUser || !user?.uid || !db) return;
+
+        const q = query(
+            collection(db, "messages"),
+            or(
+                and(where("senderId", "==", user.uid), where("receiverId", "==", selectedUser.id)),
+                and(where("senderId", "==", selectedUser.id), where("receiverId", "==", user.uid))
+            ),
+            orderBy("timestamp", "asc")
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const fetchedMessages = snapshot.docs.map(doc => ({
+                ...doc.data(),
+                id: doc.id
+            }));
+            setMessages(fetchedMessages);
+            
+            // Scroll to bottom
+            setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+        }, (error) => {
+            // CHECK CONSOLE FOR INDEX LINK HERE
+            console.error("Firestore error:", error);
+        });
+
+        return () => unsubscribe();
+    }, [selectedUser, user?.uid, db]);
+
+    const sendMessage = async () => {
+        if (!newMessage.trim() || !selectedUser || !db) return
+        
+        try {
+            await addDoc(collection(db, "messages"), {
+                text: newMessage,
+                senderId: user.uid,
+                receiverId: selectedUser.id,
+                timestamp: serverTimestamp()
+            })
+            setNewMessage("")
+        } catch (err) {
+            console.error("Error sending message:", err)
+        }
+    }
 
     return (
         <>
             <Navbar />
             <Stack direction="row" sx={{ height: 'calc(100vh - 100px)', width: "100vw", bgcolor: '#f0f2f5' }}>
-                
-                <Stack sx={{ 
-                    width: { xs: '80px', md: '350px' }, 
-                    bgcolor: 'white', 
-                    borderRight: '1px solid #ddd',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100vh'
-                }}>
-                    <Stack sx={{ p: 2 }}>
-                    <Typography variant="h6" sx={{ display: { xs: 'none', md: 'block' }, fontWeight: 'bold' }}>
-                        Chats
-                    </Typography>
-                    </Stack>
-                    <List sx={{ overflowY: 'auto', flexGrow: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
-                    {[1, 2].map((item) => (
-                        <ListItem button key={item} sx={{ px: 2 }}>
-                        <ListItemAvatar>
-                            <Avatar sx={{ bgcolor: 'primary.main' }}></Avatar>
-                        </ListItemAvatar>
-                        <ListItemText 
-                            sx={{ display: { xs: 'none', md: 'block' }, my: "10px" }}
-                            primary="Username"
-                        />
-                        </ListItem>
-                    ))}
+                {/* Sidebar */}
+                <Stack sx={{ width: { xs: '80px', md: '350px' }, bgcolor: 'white', borderRight: '1px solid #ddd' }}>
+                    <List sx={{ overflowY: 'auto' }}>
+                        {users.map((u) => (
+                            <ListItem key={u.id} component="button" onClick={() => setSelectedUser(u)} 
+                                sx={{ 
+                                    bgcolor: selectedUser?.id === u.id ? '#f0f2f5' : 'transparent', 
+                                    border: 'none', width: '100%', cursor: 'pointer', px: '10px', py: '14px'
+                                }}>
+                                <ListItemAvatar>
+                                    <Avatar src={u.userPic}>{u.username?.[0]}</Avatar>
+                                </ListItemAvatar>
+                                <ListItemText sx={{ display: { xs: 'none', md: 'block' }, textAlign: 'left' }} primary={u.username} />
+                            </ListItem>
+                        ))}
                     </List>
                 </Stack>
 
-                <Stack sx={{ flexGrow: 1, height: '100%' }}>
-                    
-                    <Paper elevation={0} sx={{ p: 2, display: 'flex', alignItems: 'center', borderRadius: 0, borderBottom: '1px solid #ddd' }}>
-                    <Avatar sx={{ mr: 2 }}></Avatar>
-                    <Stack sx={{ flexGrow: 1 }}>
-                        <Typography variant="subtitle1" fontWeight="bold">Username</Typography>
-                    </Stack>
-                    <IconButton><MoreVertIcon /></IconButton>
-                    </Paper>
+                {/* Chat Area */}
+                <Stack sx={{ flexGrow: 1 }}>
+                    {selectedUser ? (
+                        <>
+                            <Paper square elevation={0} sx={{ p: 2, borderBottom: '1px solid #ddd' }}>
+                                <Typography variant="h6">{selectedUser.username}</Typography>
+                            </Paper>
+                            
+                            <Stack sx={{ flexGrow: 1, p: 3, overflowY: 'auto', gap: 1 }}>
+                                {messages.map((msg, i) => (
+                                    <Paper key={i} sx={{ 
+                                        p: 1.5, maxWidth: '70%', borderRadius: 2,
+                                        alignSelf: msg.senderId === user.uid ? 'flex-end' : 'flex-start',
+                                        bgcolor: msg.senderId === user.uid ? 'primary.main' : 'white',
+                                        color: msg.senderId === user.uid ? 'white' : 'black'
+                                    }}>
+                                        <Typography variant="body1">{msg.text}</Typography>
+                                    </Paper>
+                                ))}
+                                <div ref={scrollRef} />
+                            </Stack>
 
-                    <Stack sx={{ 
-                    flexGrow: 1, 
-                    p: 3, 
-                    overflowY: 'auto', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: 2,
-
-                    scrollbarWidth: 'none',
-                    '&::-webkit-scrollbar': { display: 'none' }
-                    }}>
-
-                    <Paper sx={{ p: 1.5, maxWidth: '70%', alignSelf: 'flex-start', borderRadius: '15px 15px 15px 0px' }}>
-                        <Typography variant="body1">Zsidó!!!</Typography>
-                    </Paper>
-
-
-                    <Paper sx={{ p: 1.5, maxWidth: '70%', alignSelf: 'flex-end', bgcolor: 'primary.main', color: 'white', borderRadius: '15px 15px 0px 15px' }}>
-                        <Typography variant="body1">Cigány!!!!44!4</Typography>
-                    </Paper>
-                    </Stack>
-
-                    <Paper elevation={3} sx={{ p: 2, borderRadius: 0 }}>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <TextField 
-                        fullWidth 
-                        placeholder="Type a message..." 
-                        variant="outlined" 
-                        size="small"
-                        sx={{ '& fieldset': { borderRadius: '20px' } }}
-                        />
-                        <IconButton color="primary"><SendIcon /></IconButton>
-                    </Stack>
-                    </Paper>
-
+                            <Paper square sx={{ p: 2 }}>
+                                <Stack direction="row" spacing={1}>
+                                    <TextField 
+                                        fullWidth size="small" placeholder="Type a message..." 
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)} 
+                                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                                    />
+                                    <IconButton color="primary" onClick={sendMessage}>
+                                        <SendIcon />
+                                    </IconButton>
+                                </Stack>
+                            </Paper>
+                        </>
+                    ) : (
+                        <Stack justifyContent="center" alignItems="center" sx={{ height: '100%' }}>
+                            <Typography color="textSecondary">Select a contact to start chatting</Typography>
+                        </Stack>
+                    )}
                 </Stack>
             </Stack>
         </>

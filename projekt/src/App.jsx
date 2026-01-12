@@ -4,7 +4,7 @@ import firebaseConfig from "../firebaseConfig"
 import './App.css'
 import { UserContext } from './UserContext'
 import { AppContext } from './AppContext'
-import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
+import { collection, getDoc, getDocs, getFirestore, query, where, doc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -25,19 +25,20 @@ export default function App() {
   const appContext = {app, auth, navigate, db, currentPage, setCurrentPage}
 
   async function getUserInfo() {
-    if (!loggedIn || user.uid) return
+    if (!loggedIn || !user?.uid) return
 
-    const adatCollection = collection(db, 'users');
-    const adatSnapshot = await getDocs(query(adatCollection, where("userID", "==", user.uid)));
+    const docRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(docRef);
 
-    setUserInfo(adatSnapshot.docs[0].data()) 
-    console.log(adatSnapshot.docs[0].data());
+    if (docSnap.exists()) {
+      setUserInfo({ ...docSnap.data(), did: docSnap.id });
+    } 
   }
 
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => setUser(currentUser))
     getUserInfo()
-  }, [user])
+  }, [user, loggedIn, currentPage])
 
   console.log(user);  
   
