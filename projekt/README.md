@@ -1,6 +1,9 @@
-# React + Vite
+# PingMe
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ez egy egyszerű **üzentetküldő** alkalmazás
+> Van egy kezdőoldal információval a PingMe-ről.
+> Van regisztráció,<br />
+> és egy üzenet váltó rész.
 
 Currently, two official plugins are available:
 
