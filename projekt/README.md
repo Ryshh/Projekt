@@ -2,8 +2,8 @@
 
 Ez egy egyszerű **üzentetküldő** alkalmazás
 > Van egy kezdőoldal információval a PingMe-ről.
-> Van regisztráció,\
-> és egy üzenet váltó rész.
+> Van regisztráció,\ 
+és egy üzenet váltó rész.
 
 Currently, two official plugins are available:
 
