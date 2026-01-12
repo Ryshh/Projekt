@@ -1,19 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import Navbar from './Navbar'
-import { 
-    Stack, TextField, Typography, List, ListItem, ListItemAvatar, 
-    Avatar, ListItemText, Paper, IconButton 
-} from '@mui/material'
+import { Stack, TextField, Typography, List, ListItem, ListItemAvatar, Avatar, ListItemText, Paper, IconButton } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send';
 import { UserContext } from './UserContext'
 import { AppContext } from './AppContext'
-import { 
-    collection, query, where, getDocs, onSnapshot, 
-    orderBy, or, and, addDoc, serverTimestamp 
-} from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot, orderBy, or, and, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function Messages() {
-    // userInfo contains the data from the 'users' collection (username, pic, etc)
     const { user, userInfo } = useContext(UserContext) 
     const { db, setCurrentPage } = useContext(AppContext)
 
@@ -27,10 +20,8 @@ export default function Messages() {
         setCurrentPage("messages")
     }, [setCurrentPage])
 
-    // 1. Fetch Users List
     useEffect(() => {
         async function fetchUsers() {
-            // Use user?.uid (from Firebase Auth) to filter yourself out
             if (!user?.uid || !db) return
             try {
                 const q = query(collection(db, "users"));
@@ -46,11 +37,9 @@ export default function Messages() {
             }
         }
         fetchUsers()
-    }, [db, user?.uid]) // Re-run if user logs in/out
+    }, [db, user?.uid])
 
-    // 2. Real-time Message Listener
     useEffect(() => {
-        // Important: Wait until both user and selectedUser are available
         if (!selectedUser || !user?.uid || !db) return;
 
         const q = query(
@@ -69,10 +58,8 @@ export default function Messages() {
             }));
             setMessages(fetchedMessages);
             
-            // Scroll to bottom
             setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
         }, (error) => {
-            // CHECK CONSOLE FOR INDEX LINK HERE
             console.error("Firestore error:", error);
         });
 
@@ -99,7 +86,6 @@ export default function Messages() {
         <>
             <Navbar />
             <Stack direction="row" sx={{ height: 'calc(100vh - 100px)', width: "100vw", bgcolor: '#f0f2f5' }}>
-                {/* Sidebar */}
                 <Stack sx={{ width: { xs: '80px', md: '350px' }, bgcolor: 'white', borderRight: '1px solid #ddd' }}>
                     <List sx={{ overflowY: 'auto' }}>
                         {users.map((u) => (
@@ -117,7 +103,6 @@ export default function Messages() {
                     </List>
                 </Stack>
 
-                {/* Chat Area */}
                 <Stack sx={{ flexGrow: 1 }}>
                     {selectedUser ? (
                         <>
