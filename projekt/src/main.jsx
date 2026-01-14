@@ -5,6 +5,7 @@ import Home from './Home.jsx'
 import Login from './Login.jsx'
 import Messages from './Messages.jsx'
 import Notfound from './Notfound.jsx'
+import Profile from './Profile.jsx'
 
   const router = createBrowserRouter([
     { element: <App />,
@@ -12,6 +13,7 @@ import Notfound from './Notfound.jsx'
       { path: "/", element: <Home /> },
       { path: "/login", element: <Login /> },
       { path: "/messages", element: <Messages />},
+      { path: "/profile", element: <Profile /> },
       { path: "*", element: <Notfound /> }
       ]
     }

@@ -85,17 +85,19 @@ export default function Messages() {
     return (
         <>
             <Navbar />
-            <Stack direction="row" sx={{ height: 'calc(100vh - 100px)', width: "100vw", bgcolor: '#f0f2f5' }}>
-                <Stack sx={{ width: { xs: '80px', md: '350px' }, bgcolor: 'white', borderRight: '1px solid #ddd' }}>
+            <Stack direction="row" sx={{ height: 'calc(100vh - 80px)', width: "100vw", bgcolor: 'background.default' }}>
+                
+                <Stack sx={{ width: { xs: '80px', md: '350px' }, bgcolor: 'background.paper', borderRight: 1, borderColor: 'divider' }}>
                     <List sx={{ overflowY: 'auto' }}>
                         {users.map((u) => (
                             <ListItem key={u.id} component="button" onClick={() => setSelectedUser(u)} 
                                 sx={{ 
-                                    bgcolor: selectedUser?.id === u.id ? '#f0f2f5' : 'transparent', 
-                                    border: 'none', width: '100%', cursor: 'pointer', px: '10px', py: '14px'
+                                    bgcolor: selectedUser?.id === u.id ? 'action.selected' : 'transparent', 
+                                    border: 'none', width: '100%', cursor: 'pointer', px: '10px', py: '14px',
+                                    color: 'text.primary'
                                 }}>
                                 <ListItemAvatar>
-                                    <Avatar src={u.userPic}>{u.username?.[0]}</Avatar>
+                                    <Avatar src={u.userPic} imgProps={{ style: { objectFit: 'cover' } }}>{u.username?.[0]}</Avatar>
                                 </ListItemAvatar>
                                 <ListItemText sx={{ display: { xs: 'none', md: 'block' }, textAlign: 'left' }} primary={u.username} />
                             </ListItem>
@@ -106,7 +108,7 @@ export default function Messages() {
                 <Stack sx={{ flexGrow: 1 }}>
                     {selectedUser ? (
                         <>
-                            <Paper square elevation={0} sx={{ p: 2, borderBottom: '1px solid #ddd' }}>
+                            <Paper square elevation={0} sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
                                 <Typography variant="h6">{selectedUser.username}</Typography>
                             </Paper>
                             
@@ -115,8 +117,8 @@ export default function Messages() {
                                     <Paper key={i} sx={{ 
                                         p: 1.5, maxWidth: '70%', borderRadius: 2,
                                         alignSelf: msg.senderId === user.uid ? 'flex-end' : 'flex-start',
-                                        bgcolor: msg.senderId === user.uid ? 'primary.main' : 'white',
-                                        color: msg.senderId === user.uid ? 'white' : 'black'
+                                        bgcolor: msg.senderId === user.uid ? 'primary.main' : 'background.paper',
+                                        color: msg.senderId === user.uid ? 'white' : 'text.primary'
                                     }}>
                                         <Typography variant="body1">{msg.text}</Typography>
                                     </Paper>
@@ -124,7 +126,7 @@ export default function Messages() {
                                 <div ref={scrollRef} />
                             </Stack>
 
-                            <Paper square sx={{ p: 2 }}>
+                            <Paper square sx={{ p: 2, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider' }}>
                                 <Stack direction="row" spacing={1}>
                                     <TextField 
                                         fullWidth size="small" placeholder="Type a message..." 

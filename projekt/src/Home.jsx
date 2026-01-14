@@ -1,27 +1,33 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import Stack from '@mui/material/Stack';
 import Navbar from './Navbar';
-import { useContext } from 'react';
 import { AppContext } from './AppContext';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BoltIcon from '@mui/icons-material/Bolt';
 import Paper from '@mui/material/Paper';
-import { useEffect } from 'react';
+import { useTheme } from '@mui/material/styles';
 
 export default function Home() {
 
-    const { auth, navigate, setCurrentPage } = useContext(AppContext)
+    const { setCurrentPage } = useContext(AppContext)
+    const theme = useTheme();
 
     useEffect(() => {
         setCurrentPage("home")
     }, [setCurrentPage])
 
+    const lightGradient = '#c3cfe2';
+    const darkGradient = '#373737';
+
     return (
         <>
             <Navbar />
-            <Stack className='home' sx={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8, width: "100vw", height: "100vh" }}>
+            <Stack className='home' sx={{ 
+                background: theme.palette.mode === 'dark' ? darkGradient : lightGradient, 
+                display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8, width: "100vw", height: "100vh" 
+            }}>
                 <Stack>
                     <Stack spacing={6} alignItems="center" textAlign="center">
                     
@@ -46,7 +52,12 @@ export default function Home() {
                             { icon: <BoltIcon color="primary" />, title: 'Real-time', desc: 'No delays, no lag. Just instant messaging.' },
                             { icon: <ChatBubbleOutlineIcon color="primary" />, title: 'Simple', desc: 'Minimalist design for better focus.'}
                             ].map((feature, index) => (
-                            <Paper key={index} elevation={0} sx={{ p: 4, flex: 1, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.3)' }}>
+                            <Paper key={index} elevation={0} sx={{ 
+                                p: 4, flex: 1, borderRadius: 4, 
+                                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.6)', 
+                                backdropFilter: 'blur(10px)', 
+                                border: `1px solid ${theme.palette.divider}` 
+                            }}>
                                 <Stack sx={{ mb: 1 }}>{feature.icon}</Stack>
                                 <Typography variant="h6" fontWeight="bold" fontSize={"32px"}>{feature.title}</Typography>
                                 <Typography variant="body2" color="textSecondary" fontSize={"32px"}>{feature.desc}</Typography>
@@ -60,4 +71,3 @@ export default function Home() {
         </>
     )
 }
-    
