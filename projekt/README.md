@@ -2,8 +2,10 @@
 
 Ez egy egyszerű **üzentetküldő** alkalmazás
 > Van egy kezdőoldal információval a PingMe-ről.<br/>
-> Van regisztráció,
+> Van regisztráció,<br/>
 > és egy üzenet váltó rész.
+
+https://nmpingme.netlify.app/
 
 Currently, two official plugins are available:
 
